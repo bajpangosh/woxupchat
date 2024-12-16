@@ -13,10 +13,16 @@ class Woxup_Chat {
         // Add menu item to WordPress admin
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
+        
+        // Register shortcode and assets
+        add_shortcode('woxup_chat_form', array($this, 'render_chat_form'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_public_assets'));
     }
 
     public function run() {
         // Initialize plugin functionality
+        add_action('wp_ajax_woxup_chat_submit', array($this, 'handle_form_submission'));
+        add_action('wp_ajax_nopriv_woxup_chat_submit', array($this, 'handle_form_submission'));
     }
 
     /**
@@ -229,5 +235,116 @@ class Woxup_Chat {
             </form>
         </div>
         <?php
+    }
+
+    /**
+     * Enqueue public facing assets
+     */
+    public function enqueue_public_assets() {
+        wp_enqueue_style(
+            'woxup-chat-style',
+            WOXUP_CHAT_PLUGIN_URL . 'assets/css/woxup-chat.css',
+            array(),
+            $this->version
+        );
+
+        wp_enqueue_script(
+            'woxup-chat-script',
+            WOXUP_CHAT_PLUGIN_URL . 'assets/js/woxup-chat.js',
+            array('jquery'),
+            $this->version,
+            true
+        );
+
+        wp_localize_script('woxup-chat-script', 'woxupChat', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('woxup_chat_nonce')
+        ));
+    }
+
+    /**
+     * Render the chat form shortcode
+     */
+    public function render_chat_form() {
+        $whatsapp_number = get_option('woxup_chat_number', '');
+        $default_message = get_option('woxup_chat_default_message', '');
+        
+        ob_start();
+        ?>
+        <div class="woxup-chat-container">
+            <form id="woxup-chat-form" class="woxup-form">
+                <?php wp_nonce_field('woxup_chat_nonce', 'woxup_chat_nonce'); ?>
+                
+                <div class="woxup-form-group">
+                    <label for="woxup-name"><?php _e('Name', 'woxup-chat'); ?> *</label>
+                    <input type="text" id="woxup-name" name="name" required>
+                </div>
+
+                <div class="woxup-form-group">
+                    <label for="woxup-email"><?php _e('Email', 'woxup-chat'); ?> *</label>
+                    <input type="email" id="woxup-email" name="email" required>
+                </div>
+
+                <div class="woxup-form-group">
+                    <label for="woxup-subject"><?php _e('Subject', 'woxup-chat'); ?> *</label>
+                    <input type="text" id="woxup-subject" name="subject" required>
+                </div>
+
+                <div class="woxup-form-group">
+                    <label for="woxup-message"><?php _e('Message', 'woxup-chat'); ?> *</label>
+                    <textarea id="woxup-message" name="message" rows="4" required></textarea>
+                </div>
+
+                <div class="woxup-form-group">
+                    <button type="submit" class="woxup-submit-btn">
+                        <?php _e('Send Message', 'woxup-chat'); ?>
+                    </button>
+                </div>
+
+                <div id="woxup-response" class="woxup-response"></div>
+            </form>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Handle form submission via AJAX
+     */
+    public function handle_form_submission() {
+        check_ajax_referer('woxup_chat_nonce', 'nonce');
+
+        $name = sanitize_text_field($_POST['name']);
+        $email = sanitize_email($_POST['email']);
+        $subject = sanitize_text_field($_POST['subject']);
+        $message = sanitize_textarea_field($_POST['message']);
+        $whatsapp_number = get_option('woxup_chat_number', '');
+
+        if (empty($name) || empty($email) || empty($subject) || empty($message)) {
+            wp_send_json_error(array(
+                'message' => __('Please fill in all required fields.', 'woxup-chat')
+            ));
+        }
+
+        if (!is_email($email)) {
+            wp_send_json_error(array(
+                'message' => __('Please enter a valid email address.', 'woxup-chat')
+            ));
+        }
+
+        // Format message for WhatsApp
+        $whatsapp_message = sprintf(
+            "Name: %s\nEmail: %s\nSubject: %s\nMessage: %s",
+            $name,
+            $email,
+            $subject,
+            $message
+        );
+
+        wp_send_json_success(array(
+            'message' => __('Message sent successfully!', 'woxup-chat'),
+            'whatsapp_number' => $whatsapp_number,
+            'whatsapp_message' => urlencode($whatsapp_message)
+        ));
     }
 }

@@ -16,105 +16,94 @@
   --woxup-bg: #1a1a1a;
 }
 
-#woxup-chat-form {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: var(--woxup-bg);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+.woxup-chat-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-#woxup-chat-form label {
-  display: block;
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: var(--woxup-text);
+.woxup-form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-#woxup-chat-form input[type="text"],
-#woxup-chat-form input[type="email"],
-#woxup-chat-form input[type="tel"],
-#woxup-chat-form textarea {
-  width: 100%;
-  font-size: 16px;
-  padding: 12px 20px;
-  margin-bottom: 20px;
-  border: 2px solid #eee;
-  border-radius: 8px;
-  box-sizing: border-box;
-  transition: all 0.3s ease;
-  background: var(--woxup-bg);
-  color: var(--woxup-text);
+.woxup-form-group {
+    margin-bottom: 20px;
 }
 
-#woxup-chat-form input:focus,
-#woxup-chat-form textarea:focus {
-  border-color: var(--woxup-primary);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+.woxup-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
 }
 
-#woxup-chat-form input[type="submit"] {
-  width: 100%;
-  background-color: var(--woxup-primary);
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  padding: 14px 20px;
-  margin-bottom: 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.woxup-form-group input[type="text"],
+.woxup-form-group input[type="email"],
+.woxup-form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
 }
 
-#woxup-chat-form input[type="submit"]:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(37, 211, 102, 0.2);
+.woxup-form-group input[type="text"]:focus,
+.woxup-form-group input[type="email"]:focus,
+.woxup-form-group textarea:focus {
+    outline: none;
+    border-color: #25D366;
 }
 
-.form-group {
-  position: relative;
-  margin-bottom: 1.5rem;
+.woxup-submit-btn {
+    background: #25D366;
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.error-message {
-  color: var(--woxup-error);
-  font-size: 14px;
-  margin-top: -15px;
-  margin-bottom: 15px;
-  display: none;
+.woxup-submit-btn:hover {
+    background: #128C7E;
 }
 
-.success-message {
-  color: var(--woxup-success);
-  text-align: center;
-  padding: 1rem;
-  border-radius: 8px;
-  background: rgba(0, 200, 81, 0.1);
-  display: none;
+.woxup-submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
 }
 
-.loading-spinner {
-  display: none;
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid var(--woxup-primary);
-  border-radius: 50%;
-  animation: woxupSpin 1s linear infinite;
+.woxup-response {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 4px;
+    display: none;
 }
 
-@keyframes woxupSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.woxup-response.woxup-error {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+    display: block;
+}
+
+.woxup-response.woxup-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+    display: block;
+}
+
+/* Required field indicator */
+.woxup-form-group label:after {
+    content: " *";
+    color: #f44336;
 }
 
 .floating-chat {
@@ -139,23 +128,22 @@
 }
 
 @media (max-width: 600px) {
-  #woxup-chat-form {
+  .woxup-chat-container {
     padding: 1rem;
   }
   
-  #woxup-chat-form label {
+  .woxup-form-group label {
     font-size: 14px;
   }
   
-  #woxup-chat-form input[type="text"],
-  #woxup-chat-form input[type="email"],
-  #woxup-chat-form input[type="tel"],
-  #woxup-chat-form textarea {
+  .woxup-form-group input[type="text"],
+  .woxup-form-group input[type="email"],
+  .woxup-form-group textarea {
     font-size: 14px;
     padding: 10px 18px;
   }
   
-  #woxup-chat-form input[type="submit"] {
+  .woxup-submit-btn {
     font-size: 14px;
     padding: 12px 18px;
   }

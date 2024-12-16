@@ -29,50 +29,58 @@ function initWoxupChat() {
 function handleFormSubmit(event) {
     event.preventDefault();
     
-    const name = document.getElementById('woxup-name').value;
-    const email = document.getElementById('woxup-email').value;
-    const message = document.getElementById('woxup-message').value;
-    const phone = document.getElementById('woxup-phone').value;
+    const $form = document.getElementById('woxup-chat-form');
+    const $response = document.getElementById('woxup-response');
+    const $submitButton = $form.querySelector('button[type="submit"]');
     
-    if (validateForm(name, email, message)) {
-        // Format the WhatsApp message
-        const whatsappMessage = `Hello! My name is ${name}. ${message}`;
-        const encodedMessage = encodeURIComponent(whatsappMessage);
-        
-        // Open WhatsApp with the pre-filled message
-        window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
-    }
-}
-
-function validateForm(name, email, message) {
-    if (!name || !email || !message) {
-        showError('Please fill in all required fields');
-        return false;
-    }
+    // Disable submit button
+    $submitButton.disabled = true;
     
-    if (!isValidEmail(email)) {
-        showError('Please enter a valid email address');
-        return false;
-    }
+    // Clear previous messages
+    $response.classList.remove('woxup-error', 'woxup-success');
+    $response.innerHTML = '';
     
-    return true;
-}
-
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-function showError(message) {
-    const errorDiv = document.getElementById('woxup-error-message');
-    if (errorDiv) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        
-        setTimeout(() => {
-            errorDiv.style.display = 'none';
-        }, 3000);
-    }
+    // Collect form data
+    const formData = new FormData();
+    formData.append('action', 'woxup_chat_submit');
+    formData.append('nonce', woxupChat.nonce);
+    formData.append('name', document.getElementById('woxup-name').value);
+    formData.append('email', document.getElementById('woxup-email').value);
+    formData.append('message', document.getElementById('woxup-message').value);
+    formData.append('phone', document.getElementById('woxup-phone').value);
+    
+    // Send AJAX request
+    fetch(woxupChat.ajaxurl, {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(response => {
+        if (response.success) {
+            // Show success message
+            $response.classList.add('woxup-success');
+            $response.innerHTML = response.data.message;
+            
+            // Reset form
+            $form.reset();
+            
+            // Redirect to WhatsApp
+            const whatsappUrl = `https://wa.me/${response.data.whatsapp_number}?text=${response.data.whatsapp_message}`;
+            window.open(whatsappUrl, '_blank');
+        } else {
+            // Show error message
+            $response.classList.add('woxup-error');
+            $response.innerHTML = response.data.message;
+        }
+    })
+    .catch(() => {
+        $response.classList.add('woxup-error');
+        $response.innerHTML = 'An error occurred. Please try again.';
+    })
+    .finally(() => {
+        // Re-enable submit button
+        $submitButton.disabled = false;
+    });
 }
 
 function toggleDarkMode() {
