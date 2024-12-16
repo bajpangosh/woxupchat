@@ -1,0 +1,162 @@
+/**
+ * Woxup Chat Styles
+ * Version: 2.0.0
+ */
+
+:root {
+  --woxup-primary: #25D366;
+  --woxup-error: #ff4444;
+  --woxup-success: #00C851;
+  --woxup-text: #333;
+  --woxup-bg: #fff;
+}
+
+.dark-mode {
+  --woxup-text: #fff;
+  --woxup-bg: #1a1a1a;
+}
+
+#woxup-chat-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--woxup-bg);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+#woxup-chat-form label {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--woxup-text);
+}
+
+#woxup-chat-form input[type="text"],
+#woxup-chat-form input[type="email"],
+#woxup-chat-form input[type="tel"],
+#woxup-chat-form textarea {
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  background: var(--woxup-bg);
+  color: var(--woxup-text);
+}
+
+#woxup-chat-form input:focus,
+#woxup-chat-form textarea:focus {
+  border-color: var(--woxup-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+}
+
+#woxup-chat-form input[type="submit"] {
+  width: 100%;
+  background-color: var(--woxup-primary);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#woxup-chat-form input[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 211, 102, 0.2);
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.error-message {
+  color: var(--woxup-error);
+  font-size: 14px;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  display: none;
+}
+
+.success-message {
+  color: var(--woxup-success);
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(0, 200, 81, 0.1);
+  display: none;
+}
+
+.loading-spinner {
+  display: none;
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid var(--woxup-primary);
+  border-radius: 50%;
+  animation: woxupSpin 1s linear infinite;
+}
+
+@keyframes woxupSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.floating-chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--woxup-primary);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.floating-chat:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 600px) {
+  #woxup-chat-form {
+    padding: 1rem;
+  }
+  
+  #woxup-chat-form label {
+    font-size: 14px;
+  }
+  
+  #woxup-chat-form input[type="text"],
+  #woxup-chat-form input[type="email"],
+  #woxup-chat-form input[type="tel"],
+  #woxup-chat-form textarea {
+    font-size: 14px;
+    padding: 10px 18px;
+  }
+  
+  #woxup-chat-form input[type="submit"] {
+    font-size: 14px;
+    padding: 12px 18px;
+  }
+}
