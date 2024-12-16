@@ -75,8 +75,28 @@ class WoxupChat {
     public function display_admin_dashboard() {
         ?>
         <div class="wrap">
-            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <p><?php _e('Welcome to WoxupChat! Use the shortcode [woxupchat_form] to display the contact form.', 'woxupchat'); ?></p>
+            <div class="woxupchat-admin-header">
+                <h1 class="woxupchat-admin-title"><?php echo esc_html(get_admin_page_title()); ?></h1>
+                <p class="woxupchat-admin-description">
+                    <?php _e('Welcome to WoxupChat! Use the shortcode [woxupchat_form] to display the contact form.', 'woxupchat'); ?>
+                </p>
+            </div>
+            
+            <div class="woxupchat-admin-card">
+                <h2><?php _e('Quick Start Guide', 'woxupchat'); ?></h2>
+                <ol>
+                    <li><?php _e('Configure your WhatsApp number in the Settings page', 'woxupchat'); ?></li>
+                    <li><?php _e('Add the shortcode [woxupchat_form] to any post or page', 'woxupchat'); ?></li>
+                    <li><?php _e('Customize the form appearance using CSS if needed', 'woxupchat'); ?></li>
+                </ol>
+            </div>
+            
+            <div class="woxupchat-admin-card">
+                <h2><?php _e('Support', 'woxupchat'); ?></h2>
+                <p><?php _e('Need help? Visit our website:', 'woxupchat'); ?> 
+                    <a href="https://www.kloudboy.com/woxupchat" target="_blank">www.kloudboy.com/woxupchat</a>
+                </p>
+            </div>
         </div>
         <?php
     }
@@ -87,73 +107,54 @@ class WoxupChat {
     public function display_settings_page() {
         ?>
         <div class="wrap">
-            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <form method="post" action="options.php">
-                <?php
-                settings_fields('woxupchat_settings');
-                do_settings_sections('woxupchat_settings');
-                ?>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">
-                            <label for="woxupchat_number"><?php _e('WhatsApp Number', 'woxupchat'); ?></label>
-                        </th>
-                        <td>
-                            <input type="text" id="woxupchat_number" name="woxupchat_number" 
-                                value="<?php echo esc_attr(get_option('woxupchat_number')); ?>" 
-                                class="regular-text"
-                                placeholder="e.g., 919876543210"
-                            />
-                            <p class="description">
-                                <?php _e('Enter your WhatsApp number with country code (e.g., 919876543210 for India)', 'woxupchat'); ?>
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="woxupchat_default_message"><?php _e('Default Message', 'woxupchat'); ?></label>
-                        </th>
-                        <td>
-                            <textarea id="woxupchat_default_message" name="woxupchat_default_message" 
-                                class="large-text" rows="3"
-                            ><?php echo esc_textarea(get_option('woxupchat_default_message')); ?></textarea>
-                            <p class="description">
-                                <?php _e('Default message template for WhatsApp (optional)', 'woxupchat'); ?>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-                <?php submit_button(); ?>
-            </form>
+            <div class="woxupchat-admin-header">
+                <h1 class="woxupchat-admin-title"><?php _e('WoxupChat Settings', 'woxupchat'); ?></h1>
+            </div>
+            
+            <div class="woxupchat-admin-card">
+                <form method="post" action="options.php">
+                    <?php
+                    settings_fields('woxupchat_settings');
+                    do_settings_sections('woxupchat_settings');
+                    ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">
+                                <label for="woxupchat_number"><?php _e('WhatsApp Number', 'woxupchat'); ?></label>
+                            </th>
+                            <td>
+                                <input type="text" id="woxupchat_number" name="woxupchat_number" 
+                                    value="<?php echo esc_attr(get_option('woxupchat_number')); ?>" 
+                                    class="regular-text"
+                                    placeholder="e.g., 919876543210"
+                                />
+                                <p class="description">
+                                    <?php _e('Enter your WhatsApp number with country code (e.g., 919876543210 for India)', 'woxupchat'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <?php submit_button(); ?>
+                </form>
+            </div>
 
-            <h2><?php _e('Recent Form Submissions', 'woxupchat'); ?></h2>
-            <div class="woxupchat-logs">
-                <?php
-                if (file_exists($this->log_file)) {
-                    $logs = file_get_contents($this->log_file);
-                    if ($logs) {
-                        echo '<pre class="woxupchat-log-viewer">' . esc_html($logs) . '</pre>';
+            <div class="woxupchat-admin-card">
+                <h2><?php _e('Recent Form Submissions', 'woxupchat'); ?></h2>
+                <div class="woxupchat-logs">
+                    <?php
+                    if (file_exists($this->log_file)) {
+                        $logs = file_get_contents($this->log_file);
+                        if ($logs) {
+                            echo '<div class="woxupchat-log-viewer">' . esc_html($logs) . '</div>';
+                        } else {
+                            echo '<p>' . __('No logs available yet.', 'woxupchat') . '</p>';
+                        }
                     } else {
                         echo '<p>' . __('No logs available yet.', 'woxupchat') . '</p>';
                     }
-                } else {
-                    echo '<p>' . __('No logs available yet.', 'woxupchat') . '</p>';
-                }
-                ?>
+                    ?>
+                </div>
             </div>
-            <style>
-                .woxupchat-log-viewer {
-                    background: #f5f5f5;
-                    padding: 15px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    max-height: 400px;
-                    overflow-y: auto;
-                    font-family: monospace;
-                    white-space: pre-wrap;
-                    margin-top: 15px;
-                }
-            </style>
         </div>
         <?php
     }
@@ -202,7 +203,6 @@ class WoxupChat {
      */
     public function render_chat_form() {
         $whatsapp_number = get_option('woxupchat_number', '');
-        $default_message = get_option('woxupchat_default_message', '');
         
         ob_start();
         ?>
@@ -211,27 +211,40 @@ class WoxupChat {
                 <?php wp_nonce_field('woxupchat_nonce', 'woxupchat_nonce'); ?>
                 
                 <div class="woxupchat-form-group">
-                    <label for="woxupchat-name"><?php _e('Name', 'woxupchat'); ?> *</label>
+                    <label for="woxupchat-name">
+                        <?php _e('Name', 'woxupchat'); ?> <span class="required">*</span>
+                    </label>
                     <input type="text" id="woxupchat-name" name="name" required>
                 </div>
 
                 <div class="woxupchat-form-group">
-                    <label for="woxupchat-email"><?php _e('Email', 'woxupchat'); ?> *</label>
+                    <label for="woxupchat-email">
+                        <?php _e('Email', 'woxupchat'); ?> <span class="required">*</span>
+                    </label>
                     <input type="email" id="woxupchat-email" name="email" required>
                 </div>
 
                 <div class="woxupchat-form-group">
-                    <label for="woxupchat-subject"><?php _e('Subject', 'woxupchat'); ?> *</label>
+                    <label for="woxupchat-subject">
+                        <?php _e('Subject', 'woxupchat'); ?> <span class="required">*</span>
+                    </label>
                     <input type="text" id="woxupchat-subject" name="subject" required>
                 </div>
 
                 <div class="woxupchat-form-group">
-                    <label for="woxupchat-message"><?php _e('Message', 'woxupchat'); ?> *</label>
+                    <label for="woxupchat-message">
+                        <?php _e('Message', 'woxupchat'); ?> <span class="required">*</span>
+                    </label>
                     <textarea id="woxupchat-message" name="message" rows="4" required></textarea>
                 </div>
 
                 <div class="woxupchat-form-group">
                     <button type="submit" class="woxupchat-submit-btn">
+                        <span class="woxupchat-loading"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="none" d="M0 0h24v24H0z"/>
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                        </svg>
                         <?php _e('Send Message', 'woxupchat'); ?>
                     </button>
                 </div>
