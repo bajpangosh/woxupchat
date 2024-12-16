@@ -5,10 +5,20 @@
 class WoxupChat {
     private $version;
     private $plugin_name;
+    private $log_file;
 
     public function __construct() {
         $this->version = WOXUPCHAT_VERSION;
         $this->plugin_name = 'woxupchat';
+        $this->log_file = WOXUPCHAT_PLUGIN_DIR . 'logs/woxupchat.log';
+        
+        // Create logs directory if it doesn't exist
+        $logs_dir = WOXUPCHAT_PLUGIN_DIR . 'logs';
+        if (!file_exists($logs_dir)) {
+            wp_mkdir_p($logs_dir);
+            // Create .htaccess to protect logs
+            file_put_contents($logs_dir . '/.htaccess', 'deny from all');
+        }
         
         // Add menu item to WordPress admin
         add_action('admin_menu', array($this, 'add_admin_menu'));
@@ -115,8 +125,51 @@ class WoxupChat {
                 </table>
                 <?php submit_button(); ?>
             </form>
+
+            <h2><?php _e('Recent Form Submissions', 'woxupchat'); ?></h2>
+            <div class="woxupchat-logs">
+                <?php
+                if (file_exists($this->log_file)) {
+                    $logs = file_get_contents($this->log_file);
+                    if ($logs) {
+                        echo '<pre class="woxupchat-log-viewer">' . esc_html($logs) . '</pre>';
+                    } else {
+                        echo '<p>' . __('No logs available yet.', 'woxupchat') . '</p>';
+                    }
+                } else {
+                    echo '<p>' . __('No logs available yet.', 'woxupchat') . '</p>';
+                }
+                ?>
+            </div>
+            <style>
+                .woxupchat-log-viewer {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    font-family: monospace;
+                    white-space: pre-wrap;
+                    margin-top: 15px;
+                }
+            </style>
         </div>
         <?php
+    }
+
+    /**
+     * Log messages with timestamp
+     */
+    private function log_message($message, $type = 'info') {
+        if (!is_string($message)) {
+            $message = print_r($message, true);
+        }
+        
+        $timestamp = current_time('Y-m-d H:i:s');
+        $log_entry = sprintf("[%s] [%s] %s\n", $timestamp, strtoupper($type), $message);
+        
+        error_log($log_entry, 3, $this->log_file);
     }
 
     /**
@@ -194,8 +247,12 @@ class WoxupChat {
      * Handle form submission via AJAX
      */
     public function handle_form_submission() {
+        // Log form submission attempt
+        $this->log_message('Form submission started');
+        
         // Verify nonce
         if (!check_ajax_referer('woxupchat_nonce', 'nonce', false)) {
+            $this->log_message('Security check failed', 'error');
             wp_send_json_error(array(
                 'message' => __('Security check failed.', 'woxupchat')
             ));
@@ -207,11 +264,23 @@ class WoxupChat {
         $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : '';
         $message = isset($_POST['message']) ? sanitize_textarea_field($_POST['message']) : '';
         
+        // Log form data (excluding message for privacy)
+        $this->log_message(sprintf(
+            'Form submitted - Name: %s, Email: %s, Subject: %s',
+            $name,
+            $email,
+            $subject
+        ));
+        
         // Get WhatsApp number from settings
         $whatsapp_number = get_option('woxupchat_number', '');
+        if (empty($whatsapp_number)) {
+            $this->log_message('WhatsApp number not configured', 'error');
+        }
 
         // Validate required fields
         if (empty($name) || empty($email) || empty($subject) || empty($message)) {
+            $this->log_message('Required fields missing', 'error');
             wp_send_json_error(array(
                 'message' => __('Please fill in all required fields.', 'woxupchat')
             ));
@@ -219,6 +288,7 @@ class WoxupChat {
 
         // Validate email
         if (!is_email($email)) {
+            $this->log_message("Invalid email address: {$email}", 'error');
             wp_send_json_error(array(
                 'message' => __('Please enter a valid email address.', 'woxupchat')
             ));
@@ -232,6 +302,9 @@ class WoxupChat {
             $subject,
             $message
         );
+
+        // Log successful submission
+        $this->log_message('Form submission successful');
 
         // Send success response
         wp_send_json_success(array(
