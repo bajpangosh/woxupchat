@@ -1,21 +1,11 @@
 /**
- * Woxup Chat JavaScript
+ * WoxupChat JavaScript
  * Version: 2.0.0
  */
 
 jQuery(document).ready(function($) {
-    const $form = $('#woxup-chat-form');
-    const $response = $('#woxup-response');
-    const darkModeToggle = document.getElementById('woxup-dark-mode-toggle');
-    
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', toggleDarkMode);
-    }
-    
-    // Initialize dark mode based on user preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('dark-mode');
-    }
+    const $form = $('#woxupchat-form');
+    const $response = $('#woxupchat-response');
     
     $form.on('submit', function(e) {
         e.preventDefault();
@@ -26,17 +16,16 @@ jQuery(document).ready(function($) {
         $submitButton.prop('disabled', true);
         
         // Clear previous messages
-        $response.removeClass('woxup-error woxup-success').html('').show();
+        $response.removeClass('woxupchat-error woxupchat-success').html('').show();
         
         // Collect form data
         const formData = new FormData();
-        formData.append('action', 'woxup_chat_submit');
-        formData.append('nonce', $('#woxup_chat_nonce').val());
-        formData.append('name', $('#woxup-name').val());
-        formData.append('email', $('#woxup-email').val());
-        formData.append('subject', $('#woxup-subject').val());
-        formData.append('message', $('#woxup-message').val());
-        formData.append('phone', $('#woxup-phone').val());
+        formData.append('action', 'woxupchat_submit');
+        formData.append('nonce', $('#woxupchat_nonce').val());
+        formData.append('name', $('#woxupchat-name').val());
+        formData.append('email', $('#woxupchat-email').val());
+        formData.append('subject', $('#woxupchat-subject').val());
+        formData.append('message', $('#woxupchat-message').val());
         
         // Send AJAX request
         $.ajax({
@@ -48,7 +37,7 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     // Show success message
-                    $response.addClass('woxup-success').html(response.data.message);
+                    $response.addClass('woxupchat-success').html(response.data.message);
                     
                     // Reset form
                     $form[0].reset();
@@ -61,11 +50,11 @@ jQuery(document).ready(function($) {
                     }
                 } else {
                     // Show error message
-                    $response.addClass('woxup-error').html(response.data.message || 'An error occurred. Please try again.');
+                    $response.addClass('woxupchat-error').html(response.data.message || 'An error occurred. Please try again.');
                 }
             },
             error: function() {
-                $response.addClass('woxup-error').html('An error occurred. Please try again.');
+                $response.addClass('woxupchat-error').html('An error occurred. Please try again.');
             },
             complete: function() {
                 // Re-enable submit button
@@ -74,10 +63,3 @@ jQuery(document).ready(function($) {
         });
     });
 });
-
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    // Save user preference
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    localStorage.setItem('woxupDarkMode', isDarkMode);
-}

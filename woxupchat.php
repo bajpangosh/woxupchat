@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Woxup Chat
- * Plugin URI: https://www.kloudboy.com/woxup-chat
+ * Plugin Name: WoxupChat
+ * Plugin URI: https://www.kloudboy.com/woxupchat
  * Description: A modern messaging contact form with instant chat capabilities, analytics tracking, and dark mode support
  * Version: 2.0.0
  * Requires at least: 5.2
@@ -10,7 +10,7 @@
  * Author URI: https://www.kloudboy.com
  * License: GPL v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain: woxup-chat
+ * Text Domain: woxupchat
  * Domain Path: /languages
  */
 
@@ -20,17 +20,17 @@ if (!defined('WPINC')) {
 }
 
 // Define plugin constants
-define('WOXUP_CHAT_VERSION', '2.0.0');
-define('WOXUP_CHAT_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('WOXUP_CHAT_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('WOXUP_CHAT_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('WOXUPCHAT_VERSION', '2.0.0');
+define('WOXUPCHAT_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('WOXUPCHAT_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('WOXUPCHAT_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 // Load the main plugin class
-require_once WOXUP_CHAT_PLUGIN_DIR . 'includes/class-woxup-chat.php';
+require_once WOXUPCHAT_PLUGIN_DIR . 'includes/class-woxupchat.php';
 
 // Initialize the plugin
-function run_woxup_chat() {
-    $plugin = new Woxup_Chat();
+function run_woxupchat() {
+    $plugin = new WoxupChat();
     $plugin->run();
 }
-run_woxup_chat();
+run_woxupchat();
