@@ -17,12 +17,14 @@ class Woxup_Chat {
         // Register shortcode and assets
         add_shortcode('woxup_chat_form', array($this, 'render_chat_form'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_public_assets'));
+        
+        // Register AJAX handlers
+        add_action('wp_ajax_woxup_chat_submit', array($this, 'handle_form_submission'));
+        add_action('wp_ajax_nopriv_woxup_chat_submit', array($this, 'handle_form_submission'));
     }
 
     public function run() {
         // Initialize plugin functionality
-        add_action('wp_ajax_woxup_chat_submit', array($this, 'handle_form_submission'));
-        add_action('wp_ajax_nopriv_woxup_chat_submit', array($this, 'handle_form_submission'));
     }
 
     /**
@@ -312,20 +314,30 @@ class Woxup_Chat {
      * Handle form submission via AJAX
      */
     public function handle_form_submission() {
-        check_ajax_referer('woxup_chat_nonce', 'nonce');
+        // Verify nonce
+        if (!check_ajax_referer('woxup_chat_nonce', 'nonce', false)) {
+            wp_send_json_error(array(
+                'message' => __('Security check failed.', 'woxup-chat')
+            ));
+        }
 
-        $name = sanitize_text_field($_POST['name']);
-        $email = sanitize_email($_POST['email']);
-        $subject = sanitize_text_field($_POST['subject']);
-        $message = sanitize_textarea_field($_POST['message']);
+        // Get and sanitize form data
+        $name = isset($_POST['name']) ? sanitize_text_field($_POST['name']) : '';
+        $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+        $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : '';
+        $message = isset($_POST['message']) ? sanitize_textarea_field($_POST['message']) : '';
+        
+        // Get WhatsApp number from settings
         $whatsapp_number = get_option('woxup_chat_number', '');
 
+        // Validate required fields
         if (empty($name) || empty($email) || empty($subject) || empty($message)) {
             wp_send_json_error(array(
                 'message' => __('Please fill in all required fields.', 'woxup-chat')
             ));
         }
 
+        // Validate email
         if (!is_email($email)) {
             wp_send_json_error(array(
                 'message' => __('Please enter a valid email address.', 'woxup-chat')
@@ -341,6 +353,7 @@ class Woxup_Chat {
             $message
         );
 
+        // Send success response
         wp_send_json_success(array(
             'message' => __('Message sent successfully!', 'woxup-chat'),
             'whatsapp_number' => $whatsapp_number,
